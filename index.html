@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VS Code Pro 2026 — Web IDE & Editor Oficial</title>
+    
+    <!-- Google Fonts & Font Awesome 6.5.1 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- JSZip for Exporting Projects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <!-- Microsoft Monaco Editor Loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+</head>
+<body class="vscode-theme-dark">
+
+    <!-- ==================== TOP TITLE BAR ==================== -->
+    <header class="title-bar" id="titleBar">
+        <div class="title-bar-left">
+            <div class="app-icon" title="Visual Studio Code Pro">
+                <svg width="20" height="20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M72.2 97.4c2.5 1.3 5.6.8 7.4-1.2l17.2-16.1c1.9-1.8 2.9-4.3 2.9-6.9V26.8c0-2.6-1-5.1-2.9-6.9L79.6 3.8c-1.8-2-4.9-2.5-7.4-1.2-2.5 1.3-4.1 3.9-4.1 6.8v81.2c0 2.9 1.6 5.5 4.1 6.8z" fill="#0065A9"/>
+                    <path d="M72.2 97.4c1.1.6 2.3.9 3.5.9 1.4 0 2.9-.4 4.1-1.3L97 80.9c2-1.6 3-4 3-6.5V25.6c0-2.5-1-4.9-3-6.5L79.8 3c-1.8-1.5-4.3-1.8-6.4-.9-2.1 1-3.4 3.1-3.4 5.5v84.3c0 2.4 1.3 4.5 3.4 5.5z" fill="#007ACC"/>
+                    <path d="M57.7 50L13.8 15.6c-1.9-1.5-4.6-1.5-6.5 0L1.7 20.7c-2 1.6-2.3 4.5-.6 6.5l34.4 22.8L1.1 72.8c-1.7 2-1.4 4.9.6 6.5l5.6 5.1c1.9 1.5 4.6 1.5 6.5 0L57.7 50z" fill="#1F9CF0"/>
+                    <path d="M75.7 96.2L28.2 59.8l8.3-6.6 42.6 32.5c2 1.5 2.6 4.3 1.3 6.5-1.1 1.8-3.1 2.8-5.1 2.8-.7 0-1.4-.1-2.1-.5l2.5 1.7z" fill="#0065A9"/>
+                    <path d="M75.7 3.8L28.2 40.2l8.3 6.6 42.6-32.5c2-1.5 2.6-4.3 1.3-6.5-1.2-1.9-3.4-2.9-5.6-2.5l2.5-.3z" fill="#117CAD"/>
+                </svg>
+            </div>
+            
+            <nav class="menu-bar">
+                <div class="menu-item" onclick="toggleDropdown('fileMenu', event)">Arquivo
+                    <div class="dropdown-menu" id="fileMenu">
+                        <div class="dropdown-item" onclick="createNewUntitled()"><span>Novo Arquivo</span><span class="shortcut">Ctrl+N</span></div>
+                        <div class="dropdown-item" onclick="openFilePicker()"><span>Abrir Arquivo...</span><span class="shortcut">Ctrl+O</span></div>
+                        <div class="dropdown-item" onclick="openFolderPicker()"><span>Abrir Pasta do Computador...</span><span class="shortcut">Ctrl+K Ctrl+O</span></div>
+                        <div class="dropdown-separator"></div>
+                        <div class="dropdown-item" onclick="saveActiveFile()"><span>Salvar</span><span class="shortcut">Ctrl+S</span></div>
+                        <div class="dropdown-item" onclick="saveFileAs()"><span>Salvar Como...</span><span class="shortcut">Ctrl+Shift+S</span></div>
+                        <div class="dropdown-item" onclick="exportProjectZip()"><span>Baixar Projeto Completo (.zip)</span><span class="shortcut">Ctrl+Alt+S</span></div>
+                        <div class="dropdown-separator"></div>
+                        <div class="dropdown-item" onclick="closeActiveTab()"><span>Fechar Aba</span><span class="shortcut">Ctrl+W</span></div>
+                        <div class="dropdown-item" onclick="closeAllTabs()"><span>Fechar Todas as Abas</span><span class="shortcut">Ctrl+K W</span></div>
+                    </div>
+                </div>
+                
+                <div class="menu-item" onclick="toggleDropdown('editMenu', event)">Editar
+                    <div class="dropdown-menu" id="editMenu">
+                        <div class="dropdown-item" onclick="editorUndo()"><span>Desfazer</span><span class="shortcut">Ctrl+Z</span></div>
+                        <div class="dropdown-item" onclick="editorRedo()"><span>Refazer</span><span class="shortcut">Ctrl+Y</span></div>
+                        <div class="dropdown-separator"></div>
+                        <div class="dropdown-item" onclick="editorFormatDocument()"><span>Formatar Documento</span><span class="shortcut">Shift+Alt+F</span></div>
+                        <div class="dropdown-item" onclick="openMonacoFind()"><span>Localizar</span><span class="shortcut">Ctrl+F</span></div>
+                        <div class="dropdown-item" onclick="openMonacoReplace()"><span>Substituir</span><span class="shortcut">Ctrl+H</span></div>
+                    </div>
+                </div>
+
+                <div class="menu-item" onclick="toggleDropdown('selectionMenu', event)">Seleção
+                    <div class="dropdown-menu" id="selectionMenu">
+                        <div class="dropdown-item" onclick="selectAllText()"><span>Selecionar Tudo</span><span class="shortcut">Ctrl+A</span></div>
+                        <div class="dropdown-item" onclick="copyLineDown()"><span>Copiar Linha para Baixo</span><span class="shortcut">Shift+Alt+↓</span></div>
+                        <div class="dropdown-item" onclick="moveLineDown()"><span>Mover Linha para Baixo</span><span class="shortcut">Alt+↓</span></div>
+                        <div class="dropdown-item" onclick="addCursorBelow()"><span>Adicionar Cursor Abaixo</span><span class="shortcut">Ctrl+Alt+↓</span></div>
+                    </div>
+                </div>
+
+                <div class="menu-item" onclick="toggleDropdown('viewMenu', event)">Exibir
+                    <div class="dropdown-menu" id="viewMenu">
+                        <div class="dropdown-item" onclick="openCommandPalette()"><span>Paleta de Comandos...</span><span class="shortcut">Ctrl+Shift+P</span></div>
+                        <div class="dropdown-separator"></div>
+                        <div class="dropdown-item" onclick="switchPanel('explorer')"><span>Explorador</span><span class="shortcut">Ctrl+Shift+E</span></div>
+                        <div class="dropdown-item" onclick="switchPanel('search')"><span>Buscar em Arquivos</span><span class="shortcut">Ctrl+Shift+F</span></div>
+                        <div class="dropdown-item" onclick="switchPanel('extensions')"><span>Extensões & Temas</span><span class="shortcut">Ctrl+Shift+X</span></div>
+                        <div class="dropdown-separator"></div>
+                        <div class="dropdown-item" onclick="toggleLivePreview()"><span>Alternar Live Preview</span><span class="shortcut">Alt+L</span></div>
+                        <div class="dropdown-item" onclick="toggleTerminalPanel()"><span>Terminal Interativo</span><span class="shortcut">Ctrl+`</span></div>
+                        <div class="dropdown-item" onclick="toggleMinimap()"><span>Minimapa</span><span class="shortcut"></span></div>
+                        <div class="dropdown-item" onclick="toggleWordWrap()"><span>Quebra de Linha (Word Wrap)</span><span class="shortcut">Alt+Z</span></div>
+                    </div>
+                </div>
+
+                <div class="menu-item" onclick="toggleDropdown('runMenu', event)">Executar
+                    <div class="dropdown-menu" id="runMenu">
+                        <div class="dropdown-item" onclick="runActiveCode()"><span>▶ Executar Código / Live Run</span><span class="shortcut">F5</span></div>
+                        <div class="dropdown-item" onclick="toggleLivePreview()"><span>Abrir Visualização ao Vivo</span><span class="shortcut">Ctrl+Shift+D</span></div>
+                    </div>
+                </div>
+
+                <div class="menu-item" onclick="toggleDropdown('helpMenu', event)">Ajuda
+                    <div class="dropdown-menu" id="helpMenu">
+                        <div class="dropdown-item" onclick="showWelcomeScreen()"><span>Página Inicial</span><span class="shortcut"></span></div>
+                        <div class="dropdown-item" onclick="showShortcutsModal()"><span>Atalhos de Teclado</span><span class="shortcut">Ctrl+K Ctrl+S</span></div>
+                        <div class="dropdown-separator"></div>
+                        <div class="dropdown-item" onclick="showAboutModal()"><span>Sobre o VS Code Pro 2026</span><span class="shortcut"></span></div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Center Command Palette Trigger -->
+        <div class="title-bar-center" onclick="openCommandPalette()">
+            <div class="title-search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span id="titleSearchText">VS Code Pro 2026 (Ctrl+P para buscar arquivos, > para comandos)</span>
+            </div>
+        </div>
+
+        <!-- Window Controls & Actions -->
+        <div class="title-bar-right">
+            <button class="title-btn btn-run" onclick="runActiveCode()" title="Executar Código (F5) / Abrir Live Preview">
+                <i class="fa-solid fa-play text-emerald-400"></i>
+                <span>Executar</span>
+            </button>
+            <button class="title-btn" onclick="toggleLivePreview()" title="Alternar Live Preview Lado a Lado (Alt+L)">
+                <i class="fa-solid fa-desktop"></i>
+                <span>Live Preview</span>
+            </button>
+            <button class="title-btn" onclick="switchPanel('settings')" title="Configurações (Ctrl+,)">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ==================== MAIN WORKSPACE CONTAINER ==================== -->
+    <div class="main-container">
+        
+        <!-- Activity Bar (Icons on extreme left) -->
+        <nav class="activity-bar">
+            <div class="activity-top">
+                <div class="activity-item active" data-panel="explorer" title="Explorador de Arquivos (Ctrl+Shift+E)" onclick="switchPanel('explorer')">
+                    <i class="fa-regular fa-copy"></i>
+                </div>
+                <div class="activity-item" data-panel="search" title="Buscar no Projeto (Ctrl+Shift+F)" onclick="switchPanel('search')">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <div class="activity-item" data-panel="git" title="Controle de Versão Git (Ctrl+Shift+G)" onclick="switchPanel('git')">
+                    <i class="fa-solid fa-code-branch"></i>
+                </div>
+                <div class="activity-item" data-panel="preview" title="Live Preview (Alt+L)" onclick="toggleLivePreview()">
+                    <i class="fa-solid fa-display"></i>
+                </div>
+                <div class="activity-item" data-panel="extensions" title="Extensões & Temas (Ctrl+Shift+X)" onclick="switchPanel('extensions')">
+                    <i class="fa-solid fa-puzzle-piece"></i>
+                </div>
+            </div>
+            
+            <div class="activity-bottom">
+                <div class="activity-item" data-panel="settings" title="Configurações do Editor (Ctrl+,)" onclick="switchPanel('settings')">
+                    <i class="fa-solid fa-gear"></i>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar (Explorer, Search, Extensions, Settings) -->
+        <aside class="sidebar" id="sidebar">
+            
+            <!-- 1. EXPLORER PANEL -->
+            <div class="sidebar-panel-view active" id="panelExplorer">
+                <div class="sidebar-header">
+                    <span class="sidebar-title" id="workspaceName">EXPLORADOR</span>
+                    <div class="sidebar-actions">
+                        <button class="icon-btn" onclick="createNewFilePrompt()" title="Novo Arquivo"><i class="fa-solid fa-file-circle-plus"></i></button>
+                        <button class="icon-btn" onclick="createNewFolderPrompt()" title="Nova Pasta"><i class="fa-solid fa-folder-plus"></i></button>
+                        <button class="icon-btn" onclick="refreshFileTree()" title="Atualizar"><i class="fa-solid fa-rotate"></i></button>
+                        <button class="icon-btn" onclick="collapseAllFolders()" title="Recolher Todas"><i class="fa-solid fa-compress"></i></button>
+                    </div>
+                </div>
+
+                <div class="explorer-section-title">
+                    <i class="fa-solid fa-chevron-down"></i>
+                    <span id="folderTitleHeader">PROJETO WEB (DEMO)</span>
+                </div>
+
+                <div class="file-tree-container" id="fileTreeContainer">
+                    <!-- Dynamic File Tree rendered here -->
+                </div>
+
+                <div class="explorer-quick-actions">
+                    <button class="btn-full btn-subtle" onclick="openFolderPicker()">
+                        <i class="fa-regular fa-folder-open text-amber-400"></i>
+                        <span>Abrir Pasta Local do PC</span>
+                    </button>
+                    <button class="btn-full btn-subtle" onclick="openFilePicker()">
+                        <i class="fa-regular fa-file-code text-cyan-400"></i>
+                        <span>Abrir Arquivo Único</span>
+                    </button>
+                    <button class="btn-full btn-subtle" onclick="exportProjectZip()">
+                        <i class="fa-solid fa-file-zipper text-emerald-400"></i>
+                        <span>Baixar Projeto (.ZIP)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. SEARCH PANEL -->
+            <div class="sidebar-panel-view" id="panelSearch">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">BUSCA GLOBAL</span>
+                </div>
+                <div class="search-panel-body">
+                    <div class="search-input-group">
+                        <input type="text" id="globalSearchInput" placeholder="Buscar texto nos arquivos..." oninput="handleGlobalSearch(this.value)">
+                        <div class="search-options">
+                            <button class="search-opt-btn" id="optCaseSensitive" title="Diferenciar Maiúsculas/Minúsculas" onclick="toggleSearchOpt('case')">Aa</button>
+                            <button class="search-opt-btn" id="optWholeWord" title="Palavra Inteira" onclick="toggleSearchOpt('word')">"W"</button>
+                            <button class="search-opt-btn" id="optRegex" title="Expressão Regular" onclick="toggleSearchOpt('regex')">.*</button>
+                        </div>
+                    </div>
+                    <div class="search-results-list" id="searchResultsList">
+                        <div class="empty-hint">Digite um termo para buscar em todos os arquivos abertos.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. GIT SOURCE CONTROL PANEL -->
+            <div class="sidebar-panel-view" id="panelGit">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">CONTROLE DE CÓDIGO</span>
+                </div>
+                <div class="git-panel-body">
+                    <div class="git-status-card">
+                        <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#38bdf8;">
+                            <i class="fa-solid fa-code-branch"></i>
+                            <span>branch: main</span>
+                        </div>
+                        <p style="font-size:0.75rem; color:#94a3b8; margin-top:6px;">Arquivos modificados na sessão atual:</p>
+                    </div>
+                    <div id="gitModifiedList" class="git-files-list"></div>
+                </div>
+            </div>
+
+            <!-- 4. EXTENSIONS & THEMES PANEL -->
+            <div class="sidebar-panel-view" id="panelExtensions">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">EXTENSÕES & TEMAS</span>
+                </div>
+                <div class="extensions-body">
+                    <div class="section-badge">TEMAS MONACO VS CODE</div>
+                    <div class="theme-picker-grid" id="themePickerGrid">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <div class="section-badge" style="margin-top:20px;">PLUGINS INTEGRADOS</div>
+                    <div class="plugin-card">
+                        <div class="plugin-icon" style="background:#494294;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                        <div class="plugin-info">
+                            <h4>Prettier Code Formatter</h4>
+                            <p>Formatação automática e rápida com Shift+Alt+F</p>
+                        </div>
+                        <button class="btn-badge active">Ativo</button>
+                    </div>
+                    <div class="plugin-card">
+                        <div class="plugin-icon" style="background:#0288d1;"><i class="fa-solid fa-bolt"></i></div>
+                        <div class="plugin-info">
+                            <h4>Live Server & Hot Reload</h4>
+                            <p>Execução e visualização ao vivo em tempo real</p>
+                        </div>
+                        <button class="btn-badge active">Ativo</button>
+                    </div>
+                    <div class="plugin-card">
+                        <div class="plugin-icon" style="background:#e11d48;"><i class="fa-solid fa-terminal"></i></div>
+                        <div class="plugin-info">
+                            <h4>JavaScript REPL Engine</h4>
+                            <p>Console e terminal interativo integrado</p>
+                        </div>
+                        <button class="btn-badge active">Ativo</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. SETTINGS PANEL -->
+            <div class="sidebar-panel-view" id="panelSettings">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">CONFIGURAÇÕES</span>
+                </div>
+                <div class="settings-body" id="settingsBody">
+                    <!-- Config options dynamically bound -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Resizer Bar between Sidebar and Editor -->
+        <div class="resizer-handle" id="sidebarResizer"></div>
+
+        <!-- ==================== EDITOR & LIVE PREVIEW AREA ==================== -->
+        <main class="editor-main-area" id="editorMainArea">
+            
+            <!-- Editor Tabs Bar -->
+            <div class="tabs-bar-container">
+                <div class="tabs-scroll-list" id="editorTabsList">
+                    <!-- Open tabs injected here -->
+                </div>
+                <div class="tabs-actions">
+                    <button class="tab-action-btn" onclick="toggleLivePreview()" title="Dividir Janela com Live Preview (Alt+L)">
+                        <i class="fa-solid fa-table-columns"></i>
+                    </button>
+                    <button class="tab-action-btn" onclick="runActiveCode()" title="Executar Arquivo Atual (F5)">
+                        <i class="fa-solid fa-play text-emerald-400"></i>
+                    </button>
+                    <button class="tab-action-btn" onclick="closeAllTabs()" title="Fechar Todas as Abas">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Breadcrumbs -->
+            <div class="breadcrumbs-bar" id="breadcrumbsBar">
+                <i class="fa-solid fa-folder-open text-amber-400"></i>
+                <span id="breadcrumbPath">workspace &gt; index.html</span>
+            </div>
+
+            <!-- Editor Work Area (Split with Monaco and Live Preview) -->
+            <div class="editor-split-container" id="editorSplitContainer">
+                
+                <!-- Monaco Editor Host -->
+                <div class="monaco-wrapper" id="monacoWrapper">
+                    <div id="monacoEditorHost"></div>
+                    
+                    <!-- Welcome Screen (When no file is active) -->
+                    <div class="welcome-overlay" id="welcomeOverlay">
+                        <div class="welcome-content">
+                            <div class="welcome-hero-icon">
+                                <svg width="64" height="64" viewBox="0 0 100 100" fill="none">
+                                    <path d="M72.2 97.4c2.5 1.3 5.6.8 7.4-1.2l17.2-16.1c1.9-1.8 2.9-4.3 2.9-6.9V26.8c0-2.6-1-5.1-2.9-6.9L79.6 3.8c-1.8-2-4.9-2.5-7.4-1.2-2.5 1.3-4.1 3.9-4.1 6.8v81.2c0 2.9 1.6 5.5 4.1 6.8z" fill="#0065A9"/>
+                                    <path d="M72.2 97.4c1.1.6 2.3.9 3.5.9 1.4 0 2.9-.4 4.1-1.3L97 80.9c2-1.6 3-4 3-6.5V25.6c0-2.5-1-4.9-3-6.5L79.8 3c-1.8-1.5-4.3-1.8-6.4-.9-2.1 1-3.4 3.1-3.4 5.5v84.3c0 2.4 1.3 4.5 3.4 5.5z" fill="#007ACC"/>
+                                    <path d="M57.7 50L13.8 15.6c-1.9-1.5-4.6-1.5-6.5 0L1.7 20.7c-2 1.6-2.3 4.5-.6 6.5l34.4 22.8L1.1 72.8c-1.7 2-1.4 4.9.6 6.5l5.6 5.1c1.9 1.5 4.6 1.5 6.5 0L57.7 50z" fill="#1F9CF0"/>
+                                    <path d="M75.7 96.2L28.2 59.8l8.3-6.6 42.6 32.5c2 1.5 2.6 4.3 1.3 6.5-1.1 1.8-3.1 2.8-5.1 2.8-.7 0-1.4-.1-2.1-.5l2.5 1.7z" fill="#0065A9"/>
+                                    <path d="M75.7 3.8L28.2 40.2l8.3 6.6 42.6-32.5c2-1.5 2.6-4.3 1.3-6.5-1.2-1.9-3.4-2.9-5.6-2.5l2.5-.3z" fill="#117CAD"/>
+                                </svg>
+                            </div>
+                            <h2>Visual Studio Code Pro</h2>
+                            <p class="welcome-subtitle">Ambiente de Desenvolvimento Completo na Web</p>
+                            
+                            <div class="welcome-cards-grid">
+                                <div class="welcome-card" onclick="createNewUntitled()">
+                                    <i class="fa-solid fa-file-circle-plus text-sky-400"></i>
+                                    <div>
+                                        <h4>Novo Arquivo</h4>
+                                        <p>Criar documento em branco</p>
+                                    </div>
+                                </div>
+                                <div class="welcome-card" onclick="openFolderPicker()">
+                                    <i class="fa-solid fa-folder-open text-amber-400"></i>
+                                    <div>
+                                        <h4>Abrir Pasta Local</h4>
+                                        <p>Editar arquivos do seu computador</p>
+                                    </div>
+                                </div>
+                                <div class="welcome-card" onclick="loadSampleProject('web')">
+                                    <i class="fa-brands fa-html5 text-orange-400"></i>
+                                    <div>
+                                        <h4>Projeto Web Demo</h4>
+                                        <p>HTML5, CSS3, JavaScript interativo</p>
+                                    </div>
+                                </div>
+                                <div class="welcome-card" onclick="openCommandPalette()">
+                                    <i class="fa-solid fa-terminal text-purple-400"></i>
+                                    <div>
+                                        <h4>Paleta de Comandos</h4>
+                                        <p><kbd>Ctrl+Shift+P</kbd> ou <kbd>F1</kbd></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resizer for Split Preview -->
+                <div class="resizer-handle-h" id="splitResizer" style="display:none;"></div>
+
+                <!-- Live Preview Viewport Panel -->
+                <div class="live-preview-panel" id="livePreviewPanel" style="display:none;">
+                    <div class="preview-toolbar">
+                        <div class="preview-address-bar">
+                            <i class="fa-solid fa-lock text-emerald-400"></i>
+                            <span id="previewAddressUrl">http://localhost:3000/live-preview</span>
+                        </div>
+                        <div class="preview-device-actions">
+                            <button class="btn-device active" onclick="setPreviewDevice('desktop')" title="Visualização Desktop"><i class="fa-solid fa-desktop"></i></button>
+                            <button class="btn-device" onclick="setPreviewDevice('tablet')" title="Visualização Tablet (768px)"><i class="fa-solid fa-tablet-screen-button"></i></button>
+                            <button class="btn-device" onclick="setPreviewDevice('mobile')" title="Visualização Mobile (375px)"><i class="fa-solid fa-mobile-screen"></i></button>
+                            <button class="btn-device" onclick="refreshLivePreview()" title="Recarregar Preview"><i class="fa-solid fa-rotate-right"></i></button>
+                            <button class="btn-device" onclick="openPreviewInNewTab()" title="Abrir em Nova Aba"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+                            <button class="btn-device text-rose-400" onclick="toggleLivePreview()" title="Fechar Live Preview"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+                    <div class="preview-iframe-wrapper" id="previewIframeWrapper">
+                        <iframe id="livePreviewIframe" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== BOTTOM PANEL (TERMINAL, OUTPUT, PROBLEMS) ==================== -->
+            <div class="bottom-panel" id="bottomPanel">
+                <div class="panel-tabs-header">
+                    <div class="panel-tab-item active" data-tab="terminal" onclick="switchBottomTab('terminal')">
+                        <i class="fa-solid fa-terminal"></i> Terminal Interativo
+                    </div>
+                    <div class="panel-tab-item" data-tab="problems" onclick="switchBottomTab('problems')">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Problemas <span class="badge-count" id="problemsBadgeCount">0</span>
+                    </div>
+                    <div class="panel-tab-item" data-tab="output" onclick="switchBottomTab('output')">
+                        <i class="fa-solid fa-bars-staggered"></i> Saída do Console
+                    </div>
+                    <div class="panel-header-actions">
+                        <button class="icon-btn-sm" onclick="clearTerminalOutput()" title="Limpar Terminal"><i class="fa-solid fa-ban"></i></button>
+                        <button class="icon-btn-sm" onclick="toggleTerminalPanel()" title="Fechar Painel Inferior"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
+                <div class="panel-tab-content-area">
+                    <!-- 1. TERMINAL CONTENT -->
+                    <div class="tab-pane active" id="tabContentTerminal">
+                        <div class="terminal-screen" id="terminalScreen">
+                            <div class="terminal-welcome-text">
+                                VS Code Pro JavaScript REPL & Terminal v2026.1<br>
+                                Digite <strong>help</strong> para comandos ou qualquer expressão JavaScript (ex: <code>2 + 2</code>, <code>alert("Olá")</code>, <code>document.title</code>).
+                            </div>
+                            <div class="terminal-logs" id="terminalLogs"></div>
+                            <div class="terminal-input-line">
+                                <span class="terminal-prompt">&gt;</span>
+                                <input type="text" id="terminalCommandLine" autocomplete="off" spellcheck="false" placeholder="Digite um comando...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. PROBLEMS CONTENT -->
+                    <div class="tab-pane" id="tabContentProblems">
+                        <div class="problems-list" id="problemsList">
+                            <div class="no-problems-msg"><i class="fa-regular fa-circle-check text-emerald-400"></i> Nenhum problema ou erro sintático detectado no arquivo aberto.</div>
+                        </div>
+                    </div>
+
+                    <!-- 3. OUTPUT CONTENT -->
+                    <div class="tab-pane" id="tabContentOutput">
+                        <div class="output-console-screen" id="outputConsoleScreen"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ==================== STATUS BAR ==================== -->
+    <footer class="status-bar" id="statusBar">
+        <div class="status-bar-left">
+            <div class="status-item btn-status" onclick="switchPanel('git')" title="Git Branch: main">
+                <i class="fa-solid fa-code-branch"></i>
+                <span>main*</span>
+            </div>
+            <div class="status-item btn-status" onclick="switchBottomTab('problems'); openTerminalPanel();" title="Problemas de Código">
+                <i class="fa-solid fa-circle-xmark text-rose-400"></i> <span id="statusErrCount">0</span>
+                <i class="fa-solid fa-triangle-exclamation text-amber-400" style="margin-left:6px;"></i> <span id="statusWarnCount">0</span>
+            </div>
+            <div class="status-item text-sky-400 btn-status" onclick="toggleLivePreview()" title="Live Server Ativo">
+                <i class="fa-solid fa-radio"></i>
+                <span>Porta: 3000 (Ao Vivo)</span>
+            </div>
+        </div>
+
+        <div class="status-bar-right">
+            <div class="status-item" id="statusLineCol">Ln 1, Col 1</div>
+            <div class="status-item" id="statusSpaces">Espaços: 2</div>
+            <div class="status-item">UTF-8</div>
+            <div class="status-item">LF</div>
+            <div class="status-item btn-status text-emerald-400" id="statusLangMode" onclick="openLanguagePicker()" title="Alterar Modo de Linguagem">
+                <span>HTML</span>
+            </div>
+            <div class="status-item btn-status" onclick="toggleMinimap()" title="Alternar Minimapa">
+                <i class="fa-solid fa-map"></i>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== COMMAND PALETTE MODAL (Ctrl+Shift+P / Ctrl+P) ==================== -->
+    <div class="modal-backdrop" id="commandPaletteModal" onclick="closeCommandPalette(event)">
+        <div class="command-palette-card" onclick="event.stopPropagation()">
+            <div class="palette-input-wrap">
+                <i class="fa-solid fa-chevron-right" id="palettePromptIcon"></i>
+                <input type="text" id="paletteInput" placeholder="Digite um comando ou nome de arquivo..." autocomplete="off" spellcheck="false">
+            </div>
+            <div class="palette-results-list" id="paletteResultsList"></div>
+        </div>
+    </div>
+
+    <!-- ==================== KEYBOARD SHORTCUTS MODAL ==================== -->
+    <div class="modal-backdrop" id="shortcutsModal" onclick="closeShortcutsModal(event)">
+        <div class="shortcuts-card" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-keyboard text-sky-400"></i> Atalhos de Teclado (VS Code Oficial)</h3>
+                <button class="icon-btn" onclick="closeShortcutsModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="shortcuts-grid">
+                <div class="shortcut-row"><span>Paleta de Comandos</span><kbd>Ctrl+Shift+P</kbd> / <kbd>F1</kbd></div>
+                <div class="shortcut-row"><span>Buscar Arquivo Rápido</span><kbd>Ctrl+P</kbd></div>
+                <div class="shortcut-row"><span>Salvar Arquivo</span><kbd>Ctrl+S</kbd></div>
+                <div class="shortcut-row"><span>Executar / Live Preview</span><kbd>F5</kbd> / <kbd>Alt+L</kbd></div>
+                <div class="shortcut-row"><span>Formatar Documento</span><kbd>Shift+Alt+F</kbd></div>
+                <div class="shortcut-row"><span>Localizar / Substituir</span><kbd>Ctrl+F</kbd> / <kbd>Ctrl+H</kbd></div>
+                <div class="shortcut-row"><span>Abrir / Fechar Terminal</span><kbd>Ctrl+`</kbd></div>
+                <div class="shortcut-row"><span>Quebra de Linha (Word Wrap)</span><kbd>Alt+Z</kbd></div>
+                <div class="shortcut-row"><span>Copiar Linha para Baixo</span><kbd>Shift+Alt+↓</kbd></div>
+                <div class="shortcut-row"><span>Multi-Cursor</span><kbd>Alt+Click</kbd> / <kbd>Ctrl+D</kbd></div>
+                <div class="shortcut-row"><span>Fechar Aba Ativa</span><kbd>Ctrl+W</kbd></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Engine Script -->
+    <script src="script.js"></script>
+</body>
+</html>
