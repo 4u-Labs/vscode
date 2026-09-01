@@ -1,0 +1,9 @@
+database/
+uploads/
+output/
+temp/
+.env
+*.db
+*.sqlite
+*.log
+*.bak
