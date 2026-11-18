@@ -41,6 +41,11 @@
     scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
 }
 
+html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
 /* ==================== Custom Studio Scrollbars ==================== */
 ::-webkit-scrollbar {
     width: 8px;
